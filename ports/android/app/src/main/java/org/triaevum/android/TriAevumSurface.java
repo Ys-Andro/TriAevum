@@ -3,8 +3,9 @@ package org.triaevum.android;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import org.libsdl.app.SDLSurface;
 
 /** SDL retains lifecycle/input ownership; Android presents the game in a strict 18:9 viewport. */
@@ -16,10 +17,12 @@ final class TriAevumSurface extends SDLSurface {
         super(context);
         this.maximumShortEdge = maximumShortEdge;
         setBackgroundColor(Color.BLACK);
-        // The parent remains fullscreen; this view is measured to the largest 18:9
-        // rectangle that fits inside it, leaving black bars instead of stretching.
-        setLayoutParams(new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        // SDLActivity uses a FrameLayout host. Centering here produces symmetric
+        // pillar/letterboxing instead of stretching or pinning the viewport to a corner.
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER;
+        setLayoutParams(params);
     }
 
     @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
